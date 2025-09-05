@@ -8,14 +8,16 @@ import type { ToolData, ToolResult } from "../types";
 import { causes } from "../data/causes";
 import ScoreBoard from "../components/ScoreBoard";
 import StickyNavigation from "../components/StickyNavigation";
+import SuccessEnding from "./SuccessEnding";
 
 const GamePlay: React.FC = () => {
   const [selectedTool, setSelectedTool] = useState<ToolData | null>(null);
   const [examResults, setExamResults] = useState<ToolResult[]>([]);
   const [selectedCauses, setSelectedCauses] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // 🔹 Tambahan
 
-  const { currentCase, checkResults, totalScore, resetGame } = useExamination();
+  const { currentCase, checkResults, totalScore } = useExamination();
 
   const handleToolSelect = (tool: ToolData) => {
     setSelectedTool(tool);
@@ -41,7 +43,7 @@ const GamePlay: React.FC = () => {
     }
 
     if (selectedCauses.length === 0) {
-      alert("Pilih setidaknya satu penyebab kematian sebelum submit!");
+      setErrorMessage("Pilih setidaknya satu penyebab kematian sebelum submit!");
       return;
     }
 
@@ -51,6 +53,13 @@ const GamePlay: React.FC = () => {
 
     const result = checkResults(selectedLabels);
 
+    // 🔹 Kalau salah
+    if (result.wrong.length > 0 || result.matched.length === 0) {
+      setErrorMessage("Jawaban masih salah, coba lagi!");
+      return;
+    }
+
+    // 🔹 Kalau benar
     const newScore = {
       value: totalScore + result.score,
     };
@@ -58,6 +67,7 @@ const GamePlay: React.FC = () => {
     localStorage.setItem("score", JSON.stringify(newScore));
     window.dispatchEvent(new Event("scoreUpdated"));
 
+    setErrorMessage(null); // reset error
     setIsSubmitted(true);
   };
 
@@ -66,21 +76,19 @@ const GamePlay: React.FC = () => {
     setExamResults([]);
     setSelectedCauses([]);
     setIsSubmitted(false);
-  };
-
-  const handleReset = () => {
-    resetGame();
-    handleNextCase();
-    localStorage.setItem(
-      "score",
-      JSON.stringify({ value: 0, correct: 0, total: 0 })
-    );
+    setErrorMessage(null); // reset error saat lanjut
   };
 
   return (
     <div className="flex h-screen bg-white relative overflow-hidden">
-      <ScoreBoard />
-      <StickyNavigation />
+      {currentCase ? (
+        <>
+          <ScoreBoard />
+          <StickyNavigation />
+        </>
+      ) : (
+        ""
+      )}
       <div className="flex-1 flex flex-col">
         <AnimatePresence mode="wait">
           {currentCase ? (
@@ -102,11 +110,23 @@ const GamePlay: React.FC = () => {
                 onCauseSelect={handleCauseSelect}
               />
 
+              {/* 🔹 Pesan Error */}
+              {errorMessage && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-red-500 font-semibold text-center my-2"
+                >
+                  {errorMessage}
+                </motion.p>
+              )}
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={!isSubmitted ? handleSubmit : handleNextCase}
-                className={`px-4 h-full py-2 font-bold text-white ${
+                className={`px-4 w-[80%] h-full py-2 font-bold text-white ${
                   !isSubmitted ? "bg-blue-500" : "bg-green-500"
                 }`}
               >
@@ -122,21 +142,14 @@ const GamePlay: React.FC = () => {
               transition={{ duration: 0.4 }}
               className="flex flex-col items-center justify-center flex-1"
             >
-              <p className="text-xl font-bold">🎉 Semua kasus selesai!</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleReset}
-                className="mt-4 px-4 py-2 bg-purple-500 text-white font-bold"
-              >
-                Restart Game
-              </motion.button>
+              <SuccessEnding />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
+      {currentCase ? (
         <Drawer selectedTool={selectedTool} onToolSelect={handleToolSelect} />
+      ) : null}
     </div>
   );
 };

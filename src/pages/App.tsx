@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import TutorialPopup from "../components/TutorialPopup";
 import type { Score } from "../types";
@@ -10,6 +10,22 @@ const App = () => {
   const { resetGame } = useExamination();
   const savedScore = localStorage.getItem("score");
   const score: Score = savedScore ? JSON.parse(savedScore) : { value: 0 };
+  const navigate = useNavigate();
+
+  const handleNewGame = () => {
+    if (score.value && score.value >= 1) {
+      const confirmLeave = window.confirm("Yakin ingin mengulang progress?");
+
+      if (confirmLeave) {
+        navigate("/firstScene");
+        resetGame();
+      }else{
+        return null
+      }
+    } else {
+      navigate("/firstScene");
+    }
+  };
 
   const menuContainer = {
     hidden: {},
@@ -26,10 +42,9 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center gap-y-20 bg-slate-100">
-      {/* Judul */}
+    <div className="h-screen w-screen homescreen flex flex-col items-start px-15 justify-center gap-y-20 bg-slate-100">
       <motion.h1
-        className="text-6xl md:text-8xl font-extrabold tracking-wide text-gray-800"
+        className="text-6xl md:text-8xl font-extrabold tracking-wide text-white"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 80, damping: 10 }}
@@ -37,28 +52,26 @@ const App = () => {
         Fatality <span className="text-blue-600">Report</span>
       </motion.h1>
 
-      {/* Menu Utama */}
       <motion.div
-        className="flex flex-col gap-y-6 text-2xl md:text-3xl"
+        className="flex flex-col gap-y-10 text-2xl font-bold md:text-3xl"
         variants={menuContainer}
         initial="hidden"
         animate="show"
       >
         <motion.div variants={menuItem}>
-          <Link
-            to={"/firstScene"}
-            onClick={resetGame}
-            className="px-4 py-2 rounded-md text-gray-800 hover:text-blue-600 hover:translate-x-2 transition-all"
+          <button
+            onClick={handleNewGame}
+            className="px-4 py-2 rounded-md text-white hover:text-blue-600 hover:translate-x-2 transition-all "
           >
             ▶ Mulai permainan
-          </Link>
+          </button>
         </motion.div>
 
         {score.value && score.value >= 1 ? (
           <motion.div variants={menuItem}>
             <Link
-              to={"/play"}
-              className="px-4 py-2 rounded-md text-gray-800 hover:text-blue-600 hover:translate-x-2 transition-all"
+              to={"/gameplay"}
+              className="px-4 py-2 rounded-md text-white hover:text-blue-600 hover:translate-x-2 transition-all"
             >
               ⏸ Lanjutkan permainan
             </Link>
@@ -68,7 +81,7 @@ const App = () => {
         <motion.div variants={menuItem}>
           <Link
             to={"/documentation"}
-            className="px-4 py-2 rounded-md text-gray-800 hover:text-blue-600 hover:translate-x-2 transition-all"
+            className="px-4 py-2 rounded-md text-white hover:text-blue-600 hover:translate-x-2 transition-all"
           >
             📑 Dokumentasi
           </Link>
@@ -79,13 +92,12 @@ const App = () => {
           variants={menuItem}
           whileHover={{ scale: 1.05, color: "#2563eb" }}
           whileTap={{ scale: 0.95 }}
-          className="text-left cursor-pointer px-4 py-2 w-fit rounded-md text-gray-800"
+          className="text-left cursor-pointer px-4 py-2 w-fit rounded-md text-white"
         >
           📘 Tutorial
         </motion.p>
       </motion.div>
 
-      {/* Popup Tutorial */}
       <AnimatePresence>
         {onTutor && (
           <motion.div

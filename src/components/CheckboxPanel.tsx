@@ -29,7 +29,7 @@ const CheckboxPanel: React.FC<CheckboxPanelProps> = ({
 }) => {
   return (
     <motion.div
-      className="p-4 bg-slate-100 text-gray-800 shadow rounded-md"
+      className="p-4 bg-white w-[80%] text-gray-800 shadow rounded-md"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

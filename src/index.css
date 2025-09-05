@@ -7,3 +7,12 @@
 ::-webkit-scrollbar{
     display: hidden;
 }
+
+.homescreen{
+  background: url("./assets/homescreen.jpg");
+  background-size: cover;
+}
+.examination{
+  background: url("./assets/gameplay.jpg");
+  background-size: cover;
+}

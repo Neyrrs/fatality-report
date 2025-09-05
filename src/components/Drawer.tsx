@@ -14,9 +14,8 @@ const Drawer: React.FC<DrawerProps> = ({ selectedTool, onToolSelect }) => {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 250, opacity: 0 }}
       transition={{ type: "spring", stiffness: 70, damping: 15 }}
-      className="w-72 border-l bg-slate-100 p-4 shadow-lg"
+      className="fixed right-0 top-0 h-full w-90 bg-slate-100 border-l p-4 shadow-lg"
     >
-      {/* Judul */}
       <motion.h2
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -26,7 +25,6 @@ const Drawer: React.FC<DrawerProps> = ({ selectedTool, onToolSelect }) => {
         Alat Investigasi
       </motion.h2>
 
-      {/* Deskripsi */}
       <motion.p
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -36,7 +34,6 @@ const Drawer: React.FC<DrawerProps> = ({ selectedTool, onToolSelect }) => {
         Klik alat untuk menginvestigasi
       </motion.p>
 
-      {/* List alat */}
       <motion.div
         className="space-y-2"
         initial="hidden"
@@ -59,7 +56,6 @@ const Drawer: React.FC<DrawerProps> = ({ selectedTool, onToolSelect }) => {
               show: { opacity: 1, x: 0 },
             }}
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             animate={
               selectedTool?.id === tool.id
                 ? {

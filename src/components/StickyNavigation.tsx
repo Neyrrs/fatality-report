@@ -2,18 +2,25 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const StickyNavigation: React.FC = () => {
+interface Ingame {
+  gameStarted: string;
+}
+
+const StickyNavigation: React.FC<Ingame> = ({ gameStarted = false }) => {
   const navigate = useNavigate();
 
   const handleHomeClick = () => {
-    const confirmLeave = window.confirm("Yakin mau kembali ke Home?");
+    let confirmLeave;
+    if (gameStarted) {
+      confirmLeave = window.confirm(
+        "Yakin mau kembali ke Home? Progress permainan akan tersimpan saat melanjutkan permainan"
+      );
+    } else {
+      confirmLeave = window.confirm("Yakin mau kembali ke Home?");
+    }
     if (confirmLeave) {
       navigate("/");
     }
-  };
-
-  const handleBackClick = () => {
-    navigate(-1);
   };
 
   return (
@@ -25,14 +32,6 @@ const StickyNavigation: React.FC = () => {
     >
       <div className="flex justify-between items-center px-6 py-3">
         <div className="flex space-x-4 ml-5">
-          <motion.button
-            whileHover={{ scale: 1.1, backgroundColor: "rgb(71,85,105)" }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleBackClick}
-            className="px-3 py-1 rounded bg-slate-700 transition"
-          >
-            Back
-          </motion.button>
           <motion.button
             whileHover={{ scale: 1.1, backgroundColor: "rgb(37,99,235)" }}
             whileTap={{ scale: 0.9 }}
